@@ -1,8 +1,12 @@
 import { Request, Response } from 'express';
 import prisma from '../config/db';
 import { z } from 'zod';
+// import { employeeSchema } from '../dtos/employee.dto';
+// import { validateRequest } from '../validators/validateRequest';
+// import { validateRequest } from '../middlewares/validator.middleware';
+import { validateDto } from '../middlewares/validator.middleware';
 
-// Define employee schema for validation
+// Import validation schema and middleware
 const employeeSchema = z.object({
   firstname: z.string().min(1, { message: 'Firstname is required' }),
   lastname: z.string().min(1, { message: 'Lastname is required' }),
