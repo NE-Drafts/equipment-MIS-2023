@@ -15,14 +15,14 @@ enum Role {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
+  id       String              @id @default(uuid())
+  email    String              @unique
   password String
-  role     Role   @default(ADMIN)
+  role     Role                @default(ADMIN)
 }
 
 model Employee {
-  id             Int    @id @default(autoincrement())
+  id             String    @id @default(uuid())
   firstname      String
   lastname       String
   nationalId     String @unique

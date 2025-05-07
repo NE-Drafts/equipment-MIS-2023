@@ -1,48 +1,74 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { Role } from '@prisma/client';
-import { decode } from 'punycode';
+import prisma from '../config/db';
 
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
 
-export const authenticate = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const authHeader = req.headers.authorization;
+interface AuthRequest extends Request {
+  user?: {
+    id: string; // Changed from number to string
+    role: string;
+  };
+}
 
+// Authenticate any logged-in user
+export const authenticate = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    return res.status(401).json({ message: 'Unauthorized: No token provided' });
   }
 
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: number; role: Role };
-    (req as any).user = decoded; // store decoded user info in request
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: string }; // Changed from number to string
+    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
+
+    if (!user) {
+      return res.status(401).json({ message: 'Unauthorized: User not found' });
+    }
+
+    req.user = { id: user.id, role: user.role };
     next();
   } catch (err) {
-    return res.status(401).json({
-      message:
-        'You are not authorised to perform this action. Please contact the admin or check your token.',
-    });
+    return res.status(401).json({ message: 'Unauthorized: Invalid or expired token' });
   }
 };
 
-export const authorizeAdmin = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const user = (req as any).user;
-
-  if (!user || user.role !== 'ADMIN') {
-    return res.status(403).json({ message: 'Access denied: Admins only' });
+// Authorize only admin
+export const checkAdmin = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'You are not an admin (token missing)' });
   }
 
-  next(); // user is an admin, continue
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: string }; // Changed from number to string
+
+    if (!decoded?.id) {
+      return res.status(401).json({ message: 'Invalid token: no user ID found' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id }
+    });
+
+    if (!user) {
+      return res.status(401).json({ message: 'You are not logged in' });
+    }
+
+    if (user.role !== 'ADMIN') {
+      return res.status(403).json({ message: "You're not allowed to access this resource, i:e you're not the admin" });
+    }
+
+    req.user = { id: user.id, role: user.role };
+    next();
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
 };

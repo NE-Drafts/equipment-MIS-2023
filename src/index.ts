@@ -19,10 +19,9 @@ app.get('/', (req, res) => {
 }
 );
 // Catch-all route after all other routes
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route not found' });
-    
-});
+// app.use('*', (req, res) => {
+//   res.status(404).json({ message: 'Route not found' });
+// });
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
