@@ -1,4 +1,4 @@
-import express from 'express';
+import { Router } from 'express';
 import {
   addEmployee,
   getEmployees,
@@ -6,17 +6,15 @@ import {
   updateEmployee,
   deleteEmployee,
 } from '../controllers/employee.controller';
-import { authenticate, checkAdmin } from '../middlewares/auth.middleware';
+import { validateDto } from '../middlewares/validator.middleware';
+import { employeeSchema } from '../dtos/employee.dto';
 
-const router = express.Router();
+const router = Router();
 
-// Protect all routes below with authentication and admin check
-router.use(authenticate, checkAdmin);
-
-router.post('/addEmployee', addEmployee);
+router.post('/addEmployee', validateDto(employeeSchema), addEmployee);
 router.get('/getEmployees', getEmployees);
 router.get('/getEmployeeById/:id', getEmployeeById);
-router.patch('/updateEmployeeById/:id', updateEmployee);
-router.delete('/deleteEmployeeById/:id', deleteEmployee);
+router.put('/updateEmployee/:id', validateDto(employeeSchema), updateEmployee);
+router.delete('/deleteEmployee/:id', deleteEmployee);
 
 export default router;

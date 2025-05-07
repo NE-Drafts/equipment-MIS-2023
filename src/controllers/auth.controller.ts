@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 // Register schema only
 const registerSchema = z.object({
+  // name: z.string().min(2, { message: 'Name is required' }),
   email: z.string().email('Email must be a valid email address'),
   password: z.string()
     .min(4)

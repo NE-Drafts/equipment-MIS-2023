@@ -1,21 +1,19 @@
-import { plainToInstance } from 'class-transformer';
-import { validate } from 'class-validator';
+// src/middlewares/validator.middleware.ts
 import { Request, Response, NextFunction } from 'express';
+import { ZodSchema } from 'zod';
 
-export function validateDto(dtoClass: any) {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    const dtoObject = plainToInstance(dtoClass, req.body);
-    const errors = await validate(dtoObject);
+export const validateDto = (schema: ZodSchema<any>) => (req: Request, res: Response, next: NextFunction) => {
+  const result = schema.safeParse(req.body);
+  if (!result.success) {
+    return res.status(400).json({
+      message: 'Validation Error',
+      errors: result.error.errors.map(err => ({
+        field: err.path[0],
+        message: err.message,
+      })),
+    });
+  }
 
-    if (errors.length > 0) {
-      return res.status(400).json({
-        errors: errors.map(err => ({
-          property: err.property,
-          constraints: err.constraints,
-        })),
-      });
-    }
-
-    next();
-  };
-}
+  req.body = result.data; // Clean data
+  next();
+};
