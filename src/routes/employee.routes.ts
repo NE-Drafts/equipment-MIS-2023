@@ -1,11 +1,22 @@
 import express from 'express';
-import { addEmployee, getEmployees } from '../controllers/employee.controller';
+import {
+  addEmployee,
+  getEmployees,
+  getEmployeeById,
+  updateEmployee,
+  deleteEmployee,
+} from '../controllers/employee.controller';
 import { authenticate, checkAdmin } from '../middlewares/auth.middleware';
 
 const router = express.Router();
 
-// 👇 Protect both routes
-router.post('/addEmployee', authenticate, checkAdmin, addEmployee);
-router.get('/getEmployees', authenticate, checkAdmin, getEmployees);
+// Protect all routes below with authentication and admin check
+router.use(authenticate, checkAdmin);
+
+router.post('/addEmployee', addEmployee);
+router.get('/getEmployees', getEmployees);
+router.get('/getEmployeeById/:id', getEmployeeById);
+router.patch('/updateEmployeeById/:id', updateEmployee);
+router.delete('/deleteEmployeeById/:id', deleteEmployee);
 
 export default router;
