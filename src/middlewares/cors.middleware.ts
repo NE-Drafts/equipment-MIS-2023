@@ -1,7 +1,7 @@
 // src/middleware/cors.ts
 import cors from 'cors';
 
-const allowedOrigins = ['http://localhost:3000']; // Add your frontend URLs here
+const allowedOrigins = ['http://localhost:5050', 'http://localhost:3000', 'http://localhost:5730']; // Add your frontend URLs here
 
 export const corsOptions: cors.CorsOptions = {
   origin: allowedOrigins,

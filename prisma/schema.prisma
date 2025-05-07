@@ -28,7 +28,7 @@ model Employee {
   id             String    @id @default(uuid())
   firstname      String
   lastname       String
-  nationalId     Int       @unique
+  nationalId     String    @unique
   telephone      String
   email          String
   department     String

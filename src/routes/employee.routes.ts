@@ -8,8 +8,10 @@ import {
 } from '../controllers/employee.controller';
 import { validateDto } from '../middlewares/validator.middleware';
 import { employeeSchema } from '../dtos/employee.dto';
+import { authenticate, checkAdmin } from '../middlewares/auth.middleware';
 
 const router = Router();
+router.use(authenticate, checkAdmin);
 
 router.post('/addEmployee', validateDto(employeeSchema), addEmployee);
 router.get('/getEmployees', getEmployees);

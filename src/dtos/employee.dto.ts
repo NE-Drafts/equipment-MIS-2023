@@ -11,8 +11,10 @@ export const employeeSchema = z.object({
     .min(2, { message: 'Lastname must be at least 2 characters' })
     .max(50, { message: 'Lastname can be at most 50 characters' }),
 
+  // Update nationalId to be a string with length check
   nationalId: z.string()
-    .length(16, { message: 'National ID must be exactly 16 characters' }),
+    .length(16, { message: 'National ID must be exactly 16 characters' })
+    .regex(/^\d+$/, { message: 'National ID must contain only numbers' }),
 
   telephone: z.string()
     .min(10, { message: 'Telephone must be at least 10 digits' })
