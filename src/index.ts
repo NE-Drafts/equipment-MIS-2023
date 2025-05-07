@@ -8,7 +8,28 @@ import { errorHandler } from './middlewares/errorHandler';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { setupSwagger } from './swagger/components'; // Adjust the import path as necessary
-import { swaggerOptions } from './swagger'; // adjust path if needed
+
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Employee Management API',
+      version: '1.0.0',
+      description: 'API documentation for managing employees and their equipment',
+      contact: {
+        name: 'Your Name',
+        email: 'your-email@example.com',
+      },
+    },
+    servers: [
+      {
+        url: 'http://localhost:5050', // Update this to match your server URL
+        description: 'Local server',
+      },
+    ],
+  },
+  apis: ['./src/routes/*.ts', './src/controllers/*.ts'], // Adjust paths according to your project structure
+};
 
 const specs = swaggerJSDoc(swaggerOptions);
 // Swagger definition

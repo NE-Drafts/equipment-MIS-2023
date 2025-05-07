@@ -7,14 +7,76 @@ export const swaggerOptions: swaggerJSDoc.Options = {
       title: 'Employee Management API',
       version: '1.0.0',
       description: 'API for managing employees and equipment distribution',
+      contact: {
+        name: 'Your Name',
+        email: 'you@example.com',
+      },
     },
     servers: [
       {
         url: 'http://localhost:5050',
+        description: 'Local server',
+      },
+    ],
+    tags: [
+      {
+        name: 'auth',
+        description: 'Authentication endpoints',
+      },
+      {
+        name: 'employees',
+        description: 'Employee management endpoints',
       },
     ],
     components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
       schemas: {
+        RegisterUser: {
+          type: 'object',
+          required: ['name', 'email', 'password', 'confirmPassword'],
+          properties: {
+            name: {
+              type: 'string',
+              example: 'Jane Doe',
+              description: 'Full name of the user',
+            },
+            email: {
+              type: 'string',
+              example: 'janedoe@example.com',
+              description: 'Valid email address',
+            },
+            password: {
+              type: 'string',
+              example: 'StrongP@ss1',
+              description: 'Must include at least one uppercase letter, one number, and one special character',
+            },
+            confirmPassword: {
+              type: 'string',
+              example: 'StrongP@ss1',
+              description: 'Must match the password',
+            },
+            role: {
+              type: 'string',
+              enum: ['ADMIN', 'EMPLOYEE'],
+              example: 'EMPLOYEE',
+              description: 'User role',
+            },
+          },
+        },
+        LoginUser: {
+          type: 'object',
+          required: ['email', 'password'],
+          properties: {
+            email: { type: 'string', example: 'janedoe@example.com' },
+            password: { type: 'string', example: 'StrongP@ss1' },
+          },
+        },
         Employee: {
           type: 'object',
           properties: {
@@ -35,6 +97,11 @@ export const swaggerOptions: swaggerJSDoc.Options = {
         },
       },
     },
+    security: [
+      {
+        BearerAuth: [],
+      },
+    ],
   },
-  apis: ['./src/routes/*.ts'], // <- Adjust this to where your route files are
+  apis: ['./src/routes/*.ts', './src/controllers/*.ts'],
 };
